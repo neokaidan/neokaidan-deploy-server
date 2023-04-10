@@ -18,10 +18,11 @@ app.get("/", (req: Request, res: Response) => {
     res.send("Neokaidan deployment server");
 });
 
-app.get("containers", async (req: Request, res: Response) => {
+app.get("/containers", async (req: Request, res: Response) => {
     const containersList = await getActiveContainers();
 
     console.log('ALL: ' + containersList.length);
+    res.send(containersList.length.toString());
 });
 
 app.listen(port, () => {

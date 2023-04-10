@@ -15,12 +15,16 @@ export const getActiveContainers = (): Promise<Array<ContainerInfo>> => {
             all: true
         }
 
-        localDocker.listContainers(listOptions, function(err: any, containers?: Array<ContainerInfo>) {
-            if (err != null) {
-                reject(err);
-            }
+        try {
+            localDocker.listContainers(listOptions, function (err: any, containers?: Array<ContainerInfo>) {
+                if (err != null) {
+                    reject(err);
+                }
 
-            resolve(containers as Array<ContainerInfo>);
-        });
+                resolve(containers as Array<ContainerInfo>);
+            });
+        } catch (err) {
+            reject(err);
+        }
     });
 }
