@@ -1,0 +1,11 @@
+[Unit]
+Description=Deployment web server for Neokaidan
+After=network-online.target
+
+[Service]
+Type=simple
+RestartSec=3
+ExecStart=/usr/local/bin/gacd_daemon
+
+[Install]
+WantedBy=multi-user.target
