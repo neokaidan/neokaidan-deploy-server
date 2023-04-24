@@ -1,8 +1,11 @@
 # Deployment server for Neokaidan web site
 
 ### scripts
+- `./install.sh` — install 'gacd_server' as daemon
+- `./uninstall.sh` — uninstall daemon and symlink
 - `pip install -r requirements.txt` — install Python packages for development
-- `pip install .` — install daemon server
+- `pip install .` — install 'gacd_server' server with symlink
+
 ### configuration
 `.env` file for setting ENV variables:
 - PORT — TCP port for server
@@ -11,9 +14,12 @@
 ### API
 ```json
 {
-  "owner": "логин докер аккаунта",
-  "repository": "имя докер репозитория",
-  "tag": "v0.0.1",  //тэг который надо задеплоить
-  "ports": {"8080": 8080, “443”: 443} // мапинг портов между хостом и контейнером
+  "owner": "Registry Login",
+  "repository": "Docker repository",
+  "tag": "v0.0.1",
+  "ports": {"8080": 8080, “443”: 443}
 }
 ```
+
+- `tag` — git tag to deploy
+- `ports` — port mappings between docker container and server
