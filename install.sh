@@ -17,6 +17,8 @@ pip install -r requirements.txt
 # Создание символьной ссылки на main.py (cli-алиас)
 ln -sf $(dirname $(readlink -f $0))/${ENTRYPOINT} ${SYMLINK}
 
+chmod 744 ${SYMLINK}
+
 echo "GitHub Actions CD server (${PACKAGE_NAME}) installed successfully. Daemon creating..."
 
 touch $SYSTEMD_CONFIG
