@@ -4,18 +4,21 @@ import sys
 from flask import Flask, g
 from flask import request, jsonify
 
-import config as cfg
-import logger as log
-import docker_service as ds
-import __version__
+from .config import Configuration
+from .logger import get_logger
+from .docker_service import DockerService
+from .__version__ import __version__
 
 
-app = Flask(__name__)
+app: Flask = Flask("gacd_server")
+configuration = Configuration()
+logger = get_logger(configuration)
+docker_service = DockerService(configuration, logger)
 
 
 def need_auth_token(func):
     def wrapper_func(*args, **kwargs):
-        if request.headers.get("Authorization") != g.config.auth_secret:
+        if request.headers.get("Authorization") != configuration.auth_secret:
             return jsonify({"message": "Bad token"}), 401
         return func(*args, **kwargs)
     return wrapper_func
@@ -27,10 +30,10 @@ def index():
 
 
 # Получение списка всех активных контейнеров
-@need_auth_token
 @app.route("/get_active", methods=["GET"])
+@need_auth_token
 def get_active():
-    return jsonify(g.docker_service.get_active_containers()), 200
+    return jsonify(docker_service.get_active_containers()), 200
 
 
 # Деплой сборки контейнера
@@ -44,11 +47,11 @@ def get_active():
 
 @need_auth_token
 @app.route("/deploy", methods=["POST"])
-def get_active():
-    g.log.debug(f"Received {request.data}")
-    image_name, container_name = g.docker_service.get_container_name(request.json)
+def deploy():
+    logger.debug(f"Received {request.data}")
+    image_name, container_name = docker_service.get_container_name(request.json)
     ports = request.json.get("ports") if request.json.get("ports") else None
-    status, errmsg = g.docker_service.deploy_new_container(image_name, container_name, ports)
+    status, errmsg = docker_service.deploy_new_container(image_name, container_name, ports)
 
     if status:
         return jsonify({
@@ -61,15 +64,9 @@ def get_active():
         }), 400
 
 
-def main():
-    configuration = cfg.Configuration()
-    logger = log.get_logger()
-
-    g.config = configuration
-    g.log = logger
-    g.docker_service = ds.DockerService(configuration, logger)
-    app.run(host="0.0.0.0", port=configuration.PORT_ENV)
+def start_server():
+    app.run(host="0.0.0.0", port=configuration.server_port)
 
 
 if __name__ == "__main__":
-    main()
+    start_server()

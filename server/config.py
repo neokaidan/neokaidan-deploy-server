@@ -17,7 +17,7 @@ class Configuration:
         if not load_dotenv(Configuration.SECRET_FILE):
             raise EnvironmentError("Missed or empty '%s' file" % Configuration.SECRET_FILE)
 
-        self.server_port: str = os.getenv(Configuration.PORT_ENV, None)
+        self.server_port: int = int(os.getenv(Configuration.PORT_ENV, None))
         self.logs_path: str = os.getenv(Configuration.LOGS_PATH_ENV, None)
         self.auth_secret: str = os.getenv(Configuration.AUTH_SECRET_ENV, None)
         self.docker_socket: str = os.getenv(Configuration.DOCKER_SOCKET_ENV, None)

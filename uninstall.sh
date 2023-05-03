@@ -3,6 +3,7 @@
 set -e # exit script immediately on error
 
 PACKAGE_NAME="gacd_server"
+SYMLINK="/usr/local/bin/${PACKAGE_NAME}"
 SYSTEMD_CONFIG="/etc/systemd/system/${PACKAGE_NAME}.service"
 SYSTEMD_CONFIG_MULTIUSER="/etc/systemd/system/multi-user.target/${PACKAGE_NAME}.service"
 
@@ -15,8 +16,8 @@ fi
 echo "Stopping daemon..."
 systemctl stop ${PACKAGE_NAME}
 
-echo "Uninstalling via pip..."
-pip uninstall ${PACKAGE_NAME}
+echo "Uninstalling symlink..."
+rm ${SYMLINK}
 
 echo "GitHub Actions CD server (${PACKAGE_NAME}) uninstalled successfully. Daemon removing..."
 

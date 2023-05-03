@@ -1,15 +1,24 @@
 import docker
+from docker.errors import DockerException
 
-import config as cfg
-import logger as log
+from .config import Configuration
 from logging import Logger
 
 
 class DockerService:
-    def __init__(self, config: cfg.Configuration, logger: Logger):
+    def __init__(self, config: Configuration, logger: Logger):
         self.config = config
         self.log = logger
-        self.client = docker.DockerClient(base_url=self.config.docker_socket)
+        try:
+            self.client = docker.DockerClient(base_url=self.config.docker_socket)
+        except DockerException as e:
+            err_msg = str(e)
+            if err_msg.find("PermissionError") >= 0:
+                raise PermissionError(f"Socket '{self.config.docker_socket}' requires sudo rights. Run the server with sudo rights, or change socket permission")
+            elif err_msg.find("FileNotFoundError") >= 0:
+                raise FileExistsError(f"Socket '{self.config.docker_socket}' not found. Updated env file or socket")
+            else:
+                raise e
 
     def get_active_containers(self):
         containers = self.client.containers.list()
@@ -32,12 +41,12 @@ class DockerService:
         if not isinstance(item, dict):
             return ""
 
-        owner = item.get("owner")
+        registry = item.get("registry")
         repository = item.get("repository")
-        tag = item.get("tag", "latest").replace("v", "")
+        tag = item.get("tag", "latest")
 
-        if owner and repository and tag:
-            return f"{owner}/{repository}:{tag}", repository
+        if registry and repository and tag:
+            return f"{registry}/{repository}:{tag}", repository
 
         if repository and tag:
             return f"{repository}:{tag}", repository

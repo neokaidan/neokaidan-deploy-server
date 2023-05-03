@@ -4,7 +4,8 @@ set -e # exit script immediately on error
 
 PACKAGE_NAME="gacd_server"
 SYSTEMD_CONFIG="/etc/systemd/system/${PACKAGE_NAME}.service"
-SYMLINK = "/usr/local/bin/${PACKAGE_NAME}"
+ENTRYPOINT="main.py"
+SYMLINK="/usr/local/bin/${PACKAGE_NAME}"
 
 if [[ $UID != 0 ]]; then
     echo "Please run installation script with sudo"
@@ -12,7 +13,9 @@ if [[ $UID != 0 ]]; then
     exit 1
 fi
 
-pip install .
+pip install -r requirements.txt
+# Создание символьной ссылки на main.py (cli-алиас)
+ln -sf $(dirname $(readlink -f $0))/${ENTRYPOINT} ${SYMLINK}
 
 echo "GitHub Actions CD server (${PACKAGE_NAME}) installed successfully. Daemon creating..."
 
