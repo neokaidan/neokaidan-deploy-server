@@ -20,7 +20,7 @@ def get_logger(configuration: Configuration):
     if not os.path.isabs(configuration.logs_path):
         logs_abs_path = os.path.join(pathlib.Path(__file__).parent.parent.resolve(), configuration.logs_path)
 
-    os.makedirs(os.path.dirname(configuration.logs_path), exist_ok=True)
+    os.makedirs(os.path.dirname(logs_abs_path), exist_ok=True)
 
     logging.basicConfig(
         filename=os.path.join(logs_abs_path, LOG_FILE),
