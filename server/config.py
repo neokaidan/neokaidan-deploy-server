@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+import pathlib
 
 
 class Configuration:
@@ -12,10 +13,13 @@ class Configuration:
     DOCKER_SOCKET_ENV = "DOCKER_SOCKET"
 
     def __init__(self):
-        if not load_dotenv(Configuration.SHARED_FILE):
-            raise EnvironmentError("Missed or empty '%s' file" % Configuration.SHARED_FILE)
-        if not load_dotenv(Configuration.SECRET_FILE):
-            raise EnvironmentError("Missed or empty '%s' file" % Configuration.SECRET_FILE)
+        shared_file_full_path = os.path.join(pathlib.Path(__file__).parent.parent.resolve(), Configuration.SHARED_FILE)
+        secret_file_full_path = os.path.join(pathlib.Path(__file__).parent.parent.resolve(), Configuration.SECRET_FILE)
+
+        if not load_dotenv(shared_file_full_path):
+            raise EnvironmentError("Missed or empty '%s' file" % shared_file_full_path)
+        if not load_dotenv(secret_file_full_path):
+            raise EnvironmentError("Missed or empty '%s' file" % secret_file_full_path)
 
         self.server_port: int = int(os.getenv(Configuration.PORT_ENV, None))
         self.logs_path: str = os.getenv(Configuration.LOGS_PATH_ENV, None)
